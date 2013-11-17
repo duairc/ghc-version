@@ -1,0 +1,21 @@
+#!/bin/sh
+
+[ -n "$GHC_VERSION_DIR" ] || GHC_VERSION_DIR="$HOME/.ghc-version"
+[ -n "$CABAL_USER_DIR" ] || CABAL_USER_DIR="$HOME/.cabal"
+
+remove_path() {
+    PATH=$(echo $PATH | tr ":" "\n" | grep -Fv "$1" | tr "\n" ":" | head -c -1)
+}
+
+GHC=$(which ghc)
+[ -n "$GHC" ] && GHC=$("$GHC" --numeric-version)
+
+if [ -z "$GHC" ]; then
+    "No version of GHC was found in PATH. cabal cannot continue."
+    "Please set a version using ghc-version."
+    exit 1
+fi
+
+sed "s/\$ghc/$GHC/g" "$CABAL_USER_DIR/config" > "$GHC_VERSION_DIR/config-$GHC"
+remove_path "$GHC_VERSION_DIR/bin"
+cabal --config-file="$GHC_VERSION_DIR/config-$GHC" "$@"

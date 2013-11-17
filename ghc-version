@@ -2,6 +2,7 @@
 
 PROG="ghc-version"
 
+[ -n "$GHC_VERSION_DIR" ] || GHC_VERSION_DIR="$HOME/.ghc-version"
 [ -n "$GHC_DISTRIBUTION_DIR" ] || GHC_DISTRIBUTION_DIR="/opt/ghc"
 [ -n "$CABAL_USER_DIR" ] || CABAL_USER_DIR="$HOME/.cabal"
 
@@ -50,14 +51,14 @@ remove_path() {
 
 clean_path() {
     for ghc in $(ghcs); do
-        remove_path $GHC_DISTRIBUTION_DIR/$ghc/bin
-        remove_path $CABAL_USER_DIR/$ghc/bin
+        remove_path "$GHC_VERSION_DIR/bin"
+        remove_path "$GHC_DISTRIBUTION_DIR/$ghc/bin"
+        remove_path "$CABAL_USER_DIR/bin/$ghc"
     done
 }
 
 set_path() {
-    PATH=$GHC_DISTRIBUTION_DIR/$VERSION/bin:$CABAL_USER_DIR/$VERSION/bin:$PATH
-    alias cabal="cabal --config-file=$CABAL_USER_DIR/$VERSION/config"
+    PATH="$GHC_VERSION_DIR/bin:$GHC_DISTRIBUTION_DIR/$VERSION/bin:$CABAL_USER_DIR/bin/$VERSION:$PATH"
 }
 
 sourced() {

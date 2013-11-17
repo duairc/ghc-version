@@ -40,27 +40,27 @@ important if you're developing Haskell code that you want to be portable.
 
         `sudo make install`
 
-    4. Setup cabal
+    4. Finish up
 
         `cd ..`
 
-        `wget -c http://hackage.haskell.org/packages/archive/cabal-install/cabal-install-1.18.0.2.tar.gz`
+4. Setup cabal
 
-        `tar zxf cabal-install-1.18.0.2.tar.gz`
+        `mkdir -p "$HOME/.ghc-version/bin"`
 
-        `cd cabal-install-1.18.0.2`
+        `cp cabal "$HOME/.ghc-version/bin"`
 
-        `PATH="/opt/ghc/$VERSION:$PATH" "PREFIX=$HOME/.cabal/$VERSION" sh bootstrap.sh`
+        `chmod +x "$HOME/.ghc-version/bin/cabal"`
 
-        `mkdir -p "$HOME/.cabal/.packages"`
+        `[ -d "$HOME/.cabal" ] && mv "$HOME/.cabal" "$HOME/.cabal.bak.$(date +%s)"`
 
-        `ln -s "$HOME/.cabal/.packages" "$HOME/.cabal/$VERSION/packages"`
+        `mkdir "$HOME/.cabal"`
 
-        `PATH="/opt/ghc/$VERSION:$HOME/.cabal/VERSION:$PATH" cabal update --config-file="$HOME/.cabal/$VERSION/config"`
+        `sed "s|\$HOME|$HOME|g" config > "$HOME/.cabal/config"`
 
-        `sed -i "s|$HOME/.cabal|$HOME/.cabal/$VERSION|g;s|-- prefix|   prefix|g" "$HOME/.cabal/$VERSION/config"`
+        `ghc-version auto`
 
-        `cd ..`
+        `cabal update`
 
 ## Usage
 
