@@ -1,0 +1,92 @@
+#!/bin/sh
+
+PROG="ghc-version"
+
+[ -n "$GHC_DISTRIBUTION_DIR" ] || GHC_DISTRIBUTION_DIR="/opt/ghc"
+[ -n "$CABAL_USER_DIR" ] || CABAL_USER_DIR="$HOME/.cabal"
+
+usage() {
+    echo "Usage: source $PROG VERSION"
+    echo "       $PROG VERSION COMMAND [ARGS...]"
+    echo "       $PROG [-h | --help]"
+    echo ""
+    echo "If a command is given, $PROG runs that command with the given version"
+    echo "of GHC in the PATH."
+    echo ""
+    echo "When no command is given, $PROG sets PATH to contain the given version"
+    echo "of GHC. In order for the calling environment to pick up the new value of"
+    echo "PATH, $PROG must be run with source."
+}
+
+ghcs() {
+    ls $GHC_DISTRIBUTION_DIR
+}
+
+current_version() {
+    GHC=$(which ghc)
+    [ -n "$GHC" ] && GHC=$($GHC --numeric-version)
+    if [ -z "$GHC" ]; then
+        echo "No version of GHC is currently in the PATH. The following versions are available: "
+        echo ""
+        for ghc in $(ghcs); do
+            echo " * $ghc"
+        done
+        echo ""
+        echo "You can set one of these by running \"source $PROG VERSION\"."
+    else
+        echo $GHC
+    fi
+}
+
+get_version() {
+    [ "$1" = "auto" ] && filter="cat" || filter="grep ^$(echo "$1" | sed 's/\./\\\\\\\./g')"
+    v=$(ghcs | eval "$filter" | sort -n | tail -1)
+    [ -z "$v" ] && return 1 || VERSION=$v
+}
+
+remove_path() {
+    PATH=$(echo $PATH | tr ":" "\n" | grep -Fv "$1" | tr "\n" ":" | head -c -1)
+}
+
+clean_path() {
+    for ghc in $(ghcs); do
+        remove_path $GHC_DISTRIBUTION_DIR/$ghc/bin
+        remove_path $CABAL_USER_DIR/$ghc/bin
+    done
+}
+
+set_path() {
+    PATH=$GHC_DISTRIBUTION_DIR/$VERSION/bin:$CABAL_USER_DIR/$VERSION/bin:$PATH
+    alias cabal="cabal --config-file=$CABAL_USER_DIR/$VERSION/config"
+}
+
+sourced() {
+    [ "$(basename "$0")" != "$PROG" ]
+}
+
+case "$1" in
+    "-h")
+        usage
+    ;;
+    "--help")
+        usage
+    ;;
+    "")
+        current_version
+    ;;
+    *)
+        if get_version $1; then
+            shift
+            clean_path
+            set_path
+            if [ -z "$*" ]; then
+                sourced || echo "Selected GHC version $VERSION, but did you mean to run this with source?"
+            else
+                eval "$@"
+            fi
+        else
+            echo "$PROG: No such version of GHC installed ($1)"
+            sourced || exit 1
+        fi
+    ;;
+esac
