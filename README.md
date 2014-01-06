@@ -19,7 +19,7 @@ important if you're developing Haskell code that you want to be portable.
     `sudo chmod +x /usr/local/bin/ghc-version`
 
 3. Install the different versions of GHC that you want to use. By default,
-    `ghc-version` looks in `/opt/ghc/V$ERSION` for installed versions of GHC.
+    `ghc-version` looks in `/opt/ghc/$VERSION` for installed versions of GHC.
     For each version of GHC you want to use, follow the following steps:
 
     1. Set VERSION to the desired version
@@ -30,7 +30,7 @@ important if you're developing Haskell code that you want to be portable.
 
         `wget "http://www.haskell.org/ghc/dist/$VERSION/ghc-$VERSION-x86_64-unknown-linux.tar.bz2"`
 
-        `tar jxf "ghc-$VERSON-x86_64-unknown-linux.tar.bz2"`
+        `tar -xjf "ghc-$VERSION-x86_64-unknown-linux.tar.bz2"`
 
         `cd "ghc-$VERSION"`
 
