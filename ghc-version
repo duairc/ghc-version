@@ -42,7 +42,7 @@ current_version() {
 get_version() {
     [ "$1" = "auto" ] && filter="cat" || filter="grep ^$(echo "$1" | sed 's/\./\\\\\\\./g')"
     v=$(ghcs | eval "$filter" | sort -V | tail -1)
-    [ -z "$v" ] && return 1 || VERSION=$v
+    [ -z "$v" ] && return 1 || VERSION="$v"
 }
 
 remove_path() {
@@ -58,7 +58,8 @@ clean_path() {
 }
 
 set_path() {
-    PATH="$GHC_VERSION_DIR/bin:$GHC_DISTRIBUTION_DIR/$VERSION/bin:$CABAL_USER_DIR/bin/$VERSION:$PATH"
+    NUMERIC_VERSION=$("$GHC_DISTRIBUTION_DIR"/"$v"/bin/ghc --numeric-version)
+    PATH="$GHC_VERSION_DIR/bin:$GHC_DISTRIBUTION_DIR/$VERSION/bin:$CABAL_USER_DIR/bin/$NUMERIC_VERSION:$PATH"
 }
 
 sourced() {
@@ -76,7 +77,7 @@ case "$1" in
         current_version
     ;;
     *)
-        if get_version $1; then
+        if get_version "$1"; then
             shift
             clean_path
             set_path
