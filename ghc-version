@@ -41,7 +41,7 @@ current_version() {
 
 get_version() {
     [ "$1" = "auto" ] && filter="cat" || filter="grep ^$(echo "$1" | sed 's/\./\\\\\\\./g')"
-    v=$(ghcs | eval "$filter" | sort -n | tail -1)
+    v=$(ghcs | eval "$filter" | sort -V | tail -1)
     [ -z "$v" ] && return 1 || VERSION=$v
 }
 
@@ -62,7 +62,7 @@ set_path() {
 }
 
 sourced() {
-    [ "$(basename "$0")" != "$PROG" ]
+    [ "$(basename "$0" 2>/dev/null)" != "$PROG" ]
 }
 
 case "$1" in
