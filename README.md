@@ -20,47 +20,31 @@ important if you're developing Haskell code that you want to be portable.
 
 3. Install the different versions of GHC that you want to use. By default,
     `ghc-version` looks in `/opt/ghc/V$ERSION` for installed versions of GHC.
-    For each version of GHC you want to use, follow the following steps:
+    If you are using a Debian-based distribution, you can use the hvr's ghc
+    PPA, whose GHC's packages install to this location.
 
-    1. Set VERSION to the desired version
+    1. Add the PPA to your system's repositories.
 
-        `export VERSION=7.6.3`
+        `sudo add-apt-repository ppa:hvr/ghc`
 
-    2. Download and unpack the tarball.
+    2. Install the versions of GHC you want, e.g.:
 
-        `wget "http://www.haskell.org/ghc/dist/$VERSION/ghc-$VERSION-x86_64-unknown-linux.tar.bz2"`
+        `sudo apt-get install ghc-7.6.3 ghc-7.8.4 ghc-7.10.3 ghc-head`
 
-        `tar jxf "ghc-$VERSON-x86_64-unknown-linux.tar.bz2"`
+    3. Install cabal.
 
-        `cd "ghc-$VERSION"`
-
-    3. Configure and install GHC
-
-        `./configure --prefix="/opt/ghc/$VERSION"`
-
-        `sudo make install`
-
-    4. Finish up
-
-        `cd ..`
+        `sudo apt-get install cabal-install-head`
 
 4. Setup cabal
 
-        `mkdir -p "$HOME/.ghc-version/bin"`
-
-        `cp cabal "$HOME/.ghc-version/bin"`
-
-        `chmod +x "$HOME/.ghc-version/bin/cabal"`
-
-        `[ -d "$HOME/.cabal" ] && mv "$HOME/.cabal" "$HOME/.cabal.bak.$(date +%s)"`
-
-        `mkdir "$HOME/.cabal"`
-
-        `sed "s|\$HOME|$HOME|g" config > "$HOME/.cabal/config"`
-
-        `ghc-version auto`
-
-        `cabal update`
+        mkdir -p "$HOME/.ghc-version/bin"
+        cp cabal "$HOME/.ghc-version/bin/"
+        chmod +x "$HOME/.ghc-version/bin/cabal"
+        [ -d "$HOME/.cabal" ] && mv "$HOME/.cabal" "$HOME/.cabal.bak.$(date +%s)"
+        mkdir -p "$HOME/.cabal/world"
+        cp config "$HOME/.cabal/config"
+        . ghc-version auto
+        cabal update
 
 ## Usage
 
@@ -89,7 +73,7 @@ When run with no arguments, `ghc-version` prints the current version of GHC.
 
 If you add the following line to your `.bashrc` file:
 
-    ghc-version auto
+    . ghc-version auto
 
 then the most recent version of GHC installed on your system will be
 automatically selected by default.

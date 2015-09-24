@@ -18,4 +18,5 @@ fi
 
 sed "s/\$ghc/$GHC/g;s|\$HOME|$HOME|g" "$CABAL_USER_DIR/config" > "$GHC_VERSION_DIR/config-$GHC"
 remove_path "$GHC_VERSION_DIR/bin"
-/opt/cabal/head/bin/cabal --config-file="$GHC_VERSION_DIR/config-$GHC" "$@"
+PATH=$PATH:/opt/cabal/head/bin
+cabal --config-file="$GHC_VERSION_DIR/config-$GHC" "$@"
