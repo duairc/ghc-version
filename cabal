@@ -1,7 +1,7 @@
 #!/bin/sh
 
-[ -n "$GHC_VERSION_DIR" ] || GHC_VERSION_DIR="$HOME/.ghc-version"
-[ -n "$CABAL_USER_DIR" ] || CABAL_USER_DIR="$HOME/.cabal"
+[ -n "$GHC_VERSION_DIR" ] || GHC_VERSION_DIR="$HOME"/.ghc-version
+[ -n "$CABAL_USER_DIR" ] || CABAL_USER_DIR="$HOME"/.cabal
 
 remove_path() {
     PATH=$(echo $PATH | tr ":" "\n" | grep -Fv "$1" | tr "\n" ":" | head -c -1)
@@ -16,6 +16,6 @@ if [ -z "$GHC" ]; then
     exit 1
 fi
 
-sed "s/\$ghc/$GHC/g" "$CABAL_USER_DIR/config" > "$GHC_VERSION_DIR/config-$GHC"
+sed "s/\$ghc/$GHC/g;s|\$HOME|$HOME|g" "$CABAL_USER_DIR/config" > "$GHC_VERSION_DIR/config-$GHC"
 remove_path "$GHC_VERSION_DIR/bin"
-cabal --config-file="$GHC_VERSION_DIR/config-$GHC" "$@"
+/opt/cabal/head/bin/cabal --config-file="$GHC_VERSION_DIR/config-$GHC" "$@"
